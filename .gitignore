@@ -1,0 +1,15 @@
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+.env
+.env.*
+*.log
+meter.jsonl
+private/
+*.key
+*.pem
+.secretscanignore
+Thumbs.db
+.DS_Store
