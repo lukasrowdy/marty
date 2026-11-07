@@ -21,7 +21,7 @@ You log in yourself, in a normal browser window. The script never sees, types or
 2. **Get this folder onto your PC.** Either clone the repo, or on GitHub click **Code > Download ZIP**, unzip it, and open the `order-exporter` folder.
 3. **Double-click `setup.bat`.** It makes a private Python environment in `.venv` inside this folder and installs the two packages (Playwright and openpyxl). Takes a minute or two. It ends with "Setup finished".
 
-Nothing else to install: the exporter drives **Microsoft Edge**, which is already on every Windows 11 PC. (To use Chrome instead, set `channel = "chrome"` in `config.toml`.)
+The exporter drives **Google Chrome**. If Chrome isn't installed it uses **Microsoft Edge** instead, which every Windows 11 PC already has, so there's nothing else to install.
 
 ### Test it without logging in (dry run)
 
@@ -38,11 +38,23 @@ run.bat --dry-run
 ### The real run
 
 6. **Set your weekly grocery budget** and anything else in `config.toml` (open it with Notepad). See [Settings](#settings).
-7. **Double-click `run.bat`** (or run `run.bat` from a Command Prompt). By default it reads the last 30 days for all three retailers.
-8. An Edge window opens on Amazon's order page. **Log in there yourself** (and pass any "are you a robot" check). When you can see your order list, **switch back to the black console window and press Enter.**
-9. The script goes through your orders page by page. Leave the browser window alone while it works. If a site asks for a login or a robot check partway through, the console tells you; deal with it in the browser and press Enter.
-10. It then does the same for Walmart and Sam's Club: log in, press Enter.
-11. When it finishes, the browser closes and the console lists the files it wrote in `output\`. Press any key to close the console.
+7. **Double-click `run.bat`** (or run `run.bat` from a Command Prompt). By default it reads the last 30 days.
+8. **Pick your vendors.** The console asks:
+   ```
+   Which vendors should I export?
+       1) Amazon
+       2) Walmart
+       3) Sam's Club
+     Type numbers or names separated by commas (like 1,3), or all.
+     Press Enter for: Amazon, Walmart, Sam's Club
+   ```
+   Type `1,3`, `amazon, sams`, or `all`, or just press Enter for the vendors listed in `config.toml`.
+9. **Log in once, on every tab.** Chrome opens with one tab per vendor you picked, each on its sign-in page. Log in on each tab yourself (and pass any "are you a robot" check). When you're logged in on all of them, **switch back to the black console window and press Enter once.**
+10. The script checks every tab. If one still shows a sign-in page or a robot check, it names that vendor and waits for you to finish there and press Enter again.
+11. Then it exports each vendor in turn, page by page, with no more questions. Leave the browser alone while it works. If a site asks you to log in again or shows a robot check partway through, the console tells you; deal with it in the browser and press Enter.
+12. When it finishes, the browser closes and the console lists the files it wrote in `output\`. Press any key to close the console.
+
+You log in again on each run: the browser is temporary and keeps nothing once it closes (see [Privacy and safety](#privacy-and-safety)). To skip the vendor question, set `ask_for_vendors = false` in `config.toml`, or name the vendors on the command line with `--retailers`.
 
 Stop any time with **Ctrl+C**; orders already read are kept and written out.
 
@@ -59,12 +71,12 @@ That reads only the previous full week (Monday to Sunday by default), and gives 
 ### All the options
 
 ```
-run.bat                              last 30 days (lookback_days in config.toml)
+run.bat                              asks which vendors, then reads the last 30 days (lookback_days in config.toml)
 run.bat --last-week                  the previous full week
 run.bat --week 2026-10-28            the full week containing that date
 run.bat --since 2026-01-01           from a date to today
 run.bat --since 2026-01-01 --until 2026-03-31
-run.bat --retailers amazon,walmart   only some retailers (amazon, walmart, samsclub)
+run.bat --retailers amazon,walmart   these vendors, without asking (amazon, walmart, samsclub)
 run.bat --dry-run                    sample file, no browser, nothing remembered
 run.bat --from-json output\raw_orders_2026-10-08_to_2026-11-07.json
                                      re-tag a saved scrape with your updated rules, no login needed
@@ -187,13 +199,14 @@ All in `config.toml` (open with Notepad). The main ones:
 
 | Setting | Default | Meaning |
 |---|---|---|
-| `retailers` | all three | Which retailers a normal run reads |
+| `retailers` | all three | The vendors a run reads; the default answer to the vendor question |
+| `ask_for_vendors` | `true` | Ask which vendors to export at the start of each run |
 | `lookback_days` | 30 | How far back a run with no dates goes |
 | `week_starts_on` | `"monday"` | First day of the week for summaries and `--last-week` |
 | `output_dir` | `"output"` | Where files go |
 | `order_adjustments` | `"allocate"` | Share tax/fees across items, or `"ignore"` |
 | `weekly_grocery` | 250.00 | Weekly grocery budget |
-| `channel` | `"msedge"` | Browser: `msedge`, `chrome`, or `chromium` (needs `.venv\Scripts\python -m playwright install chromium`) |
+| `channel` | `"chrome"` | Browser: `chrome`, `msedge`, or `chromium` (needs `.venv\Scripts\python -m playwright install chromium`). If it won't start, the others are tried in turn. |
 | `delay_seconds` | 2.0 | Pause between order pages. Slower is gentler and trips fewer robot checks. |
 | `[ledger]` | | Ledger date format, description, accounts, category names, duplicate skipping |
 

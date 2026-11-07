@@ -208,8 +208,23 @@ class Scraper:
         self.delay, self.max_orders, self.max_pages = delay, max_orders, max_pages
         self.debug_dir, self.save_all_debug, self.ask, self.log = debug_dir, save_all_debug, ask, log
         self.orders: list[Order] = []
-        self.list_page = context.new_page()
-        self.detail_page = context.new_page()
+        self.list_page = context.new_page()  # this vendor's own tab: sign-in first, then the order list
+        self._detail_page = None
+
+    @property
+    def detail_page(self):
+        """Second tab for order details, opened only when this vendor's export starts."""
+        if self._detail_page is None or self._detail_page.is_closed():
+            self._detail_page = self.ctx.new_page()
+        return self._detail_page
+
+    def close(self) -> None:
+        for page in (self._detail_page, self.list_page):
+            try:
+                if page is not None and not page.is_closed():
+                    page.close()
+            except Exception:
+                pass
 
     # -- helpers -------------------------------------------------------------------------------------
     def _settle(self, page, timeout: int = 8000) -> None:
@@ -280,9 +295,24 @@ class Scraper:
         return False
 
     # -- the work ------------------------------------------------------------------------------------
-    def wait_for_login(self) -> None:
+    def open_login(self) -> None:
+        """Load this vendor's sign-in / order-history page in its tab. Does not wait."""
         start = self.site.get("login_url") or expand_list_urls(self.site, self.since, self.until)[0]
-        self.list_page.goto(start, wait_until="domcontentloaded")
+        try:
+            self.list_page.goto(start, wait_until="domcontentloaded")
+        except Exception as e:  # a slow or failed load still leaves the tab there to log in on
+            self.log(f"  {self.site['name']}: the sign-in page was slow to load ({str(e).splitlines()[0]})")
+
+    def login_status(self) -> str | None:
+        """None when this tab looks logged in, else what is still needed ("sign in", "solve the check")."""
+        try:
+            return self._needs_human(self.list_page)
+        except Exception:
+            return None
+
+    def wait_for_login(self) -> None:
+        """One vendor on its own: open its page and wait for Enter. login_all() does several at once."""
+        self.open_login()
         self.list_page.bring_to_front()
         self.ask(f"\n>>> {self.site['name']}: log in in the browser window (and pass any check it shows).\n"
                  f"    When you can see your order history, come back here and press Enter... ")
@@ -353,25 +383,63 @@ class Scraper:
         return orders
 
 
+def login_all(scrapers: list["Scraper"], ask: Callable[[str], str] = input, log: Callable[[str], None] = print,
+              rechecks: int = 2) -> list[str]:
+    """Open every vendor's sign-in page in its own tab at once, then wait for ONE Enter.
+
+    After Enter, each tab is checked; any still on a sign-in page or a robot check is named and you get
+    another chance. Returns the names still not logged in (their export will prompt again when it starts).
+    """
+    if not scrapers:
+        return []
+    for s in scrapers:
+        s.open_login()
+    scrapers[0].list_page.bring_to_front()
+    names = ", ".join(s.site["name"] for s in scrapers)
+    ask(f"\n>>> One tab is open for each vendor: {names}.\n"
+        f"    Log in on every tab (and pass any robot check). You only do this once for this run.\n"
+        f"    When you're logged in on all of them, come back here and press Enter... ")
+    pending: list[tuple[Scraper, str]] = []
+    for _ in range(rechecks + 1):
+        pending = [(s, need) for s in scrapers if (need := s.login_status())]
+        if not pending:
+            log("  All tabs look logged in. Starting the export; leave the browser alone until it finishes.")
+            return []
+        if _ == rechecks:
+            break
+        pending[0][0].list_page.bring_to_front()
+        waiting = "; ".join(f"{s.site['name']} ({need})" for s, need in pending)
+        ask(f"\n  Still waiting on: {waiting}.\n  Finish in those tabs, then press Enter... ")
+    left = [s.site["name"] for s, _ in pending]
+    log(f"  Going ahead. Not logged in yet: {', '.join(left)}; you'll be asked again when each one starts.")
+    return left
+
+
+BROWSER_LABELS = {"chrome": "Google Chrome", "msedge": "Microsoft Edge", "chromium": "Playwright's Chromium"}
+
+
 def launch_browser(playwright, channel: str, headless: bool = False, executable_path: str | None = None,
                    log: Callable[[str], None] = print):
-    """Fresh, throwaway browser. channel: msedge (built into Windows 11), chrome, or chromium (bundled)."""
-    kwargs: dict = {"headless": headless, "args": ["--disable-blink-features=AutomationControlled"]}
+    """Fresh, throwaway browser. Tries the configured channel first, then the others:
+    chrome (Google Chrome), msedge (built into Windows 11), chromium (Playwright's bundled copy)."""
+    base: dict = {"headless": headless, "args": ["--disable-blink-features=AutomationControlled"]}
     if executable_path:
-        kwargs["executable_path"] = executable_path
-    elif channel in ("msedge", "chrome"):
-        kwargs["channel"] = channel
-    try:
-        browser = playwright.chromium.launch(**kwargs)
-    except Exception as e:
-        if "channel" not in kwargs:
-            raise RuntimeError(f"could not start the browser ({e}). Run: python -m playwright install chromium") from e
-        log(f"  could not start {channel} ({str(e).splitlines()[0]}); trying Playwright's bundled Chromium")
-        kwargs.pop("channel")
+        attempts = [("custom", dict(base, executable_path=executable_path))]
+    else:
+        order = [channel] + [c for c in ("chrome", "msedge", "chromium") if c != channel]
+        attempts = [(c, dict(base, channel=c) if c in ("chrome", "msedge") else dict(base)) for c in order]
+    browser, errors = None, []
+    for label, kwargs in attempts:
         try:
             browser = playwright.chromium.launch(**kwargs)
-        except Exception as e2:
-            raise RuntimeError("could not start any browser. Install Edge or Chrome, or run: "
-                               "python -m playwright install chromium") from e2
+        except Exception as e:
+            errors.append(f"{BROWSER_LABELS.get(label, label)}: {str(e).splitlines()[0]}")
+            continue
+        if errors:
+            log(f"  {errors[0]}. Using {BROWSER_LABELS.get(label, label)} instead.")
+        break
+    if browser is None:
+        raise RuntimeError("could not start any browser. Install Google Chrome, or run: "
+                           "python -m playwright install chromium\n  " + "\n  ".join(errors))
     context = browser.new_context(no_viewport=not headless, locale="en-US")
     return browser, context

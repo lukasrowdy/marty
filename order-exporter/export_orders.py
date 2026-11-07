@@ -2,14 +2,14 @@
 """Export Amazon, Walmart and Sam's Club order history to CSV, Excel, a Ledger import file and a weekly summary.
 
     python export_orders.py --dry-run                 test everything with the sample file, no browser, no login
-    python export_orders.py                           last 30 days (lookback_days in config.toml), all retailers
+    python export_orders.py                           asks which vendors, then the last 30 days (lookback_days)
     python export_orders.py --last-week               the previous full week; the weekly-paste routine
     python export_orders.py --since 2026-01-01        from a date to today
     python export_orders.py --retailers amazon,walmart
     python export_orders.py --from-json output\\raw_orders_....json   re-tag a saved scrape without logging in
 
-A browser window opens for each retailer. You log in yourself; the script waits for you to press Enter,
-then reads your order history. No passwords are typed, read or stored, and the browser session is thrown
+Chrome opens with one tab per vendor, each on its sign-in page. You log in yourself on every tab, press
+Enter once, and the script reads each vendor's order history in turn. No passwords are typed, read or stored, and the browser session is thrown
 away when the run ends. Nothing is sent anywhere: all output stays in the output folder.
 """
 from __future__ import annotations
@@ -85,12 +85,57 @@ def date_window(args, cfg, sample_orders: list[Order] | None) -> tuple[date, dat
     return since, until
 
 
+def parse_vendor_choice(text: str, default: list[str]) -> list[str]:
+    """'1,3' / 'amazon, sams' / 'all' / '' (= default) -> retailer keys in menu order. ValueError if unclear."""
+    keys = list(RETAILERS)
+    t = text.strip()
+    if not t:
+        return list(default)
+    if t.lower() == "all":
+        return keys
+    picked: set[str] = set()
+    for part in [p.strip() for p in t.replace(";", ",").split(",") if p.strip()]:
+        tokens = part.split() if all(tok.isdigit() for tok in part.split()) else [part]  # "1 3" works too
+        for tok in tokens:
+            if tok.isdigit():
+                if not 1 <= int(tok) <= len(keys):
+                    raise ValueError(f"there is no vendor number {tok}")
+                picked.add(keys[int(tok) - 1])
+                continue
+            norm = tok.lower().replace("'", "").replace("\u2019", "").replace(" ", "")
+            hits = [k for k in keys if k.startswith(norm) or
+                    RETAILERS[k].lower().replace("'", "").replace(" ", "").startswith(norm)]
+            if len(hits) != 1:
+                raise ValueError(f"{tok!r} doesn't match one vendor; use a number or a name from the list")
+            picked.add(hits[0])
+    return [k for k in keys if k in picked]
+
+
+def choose_vendors(default: list[str], ask=input, say=print) -> list[str]:
+    keys = list(RETAILERS)
+    menu = "\n".join(f"    {n}) {RETAILERS[k]}" for n, k in enumerate(keys, start=1))
+    default_names = ", ".join(RETAILERS[k] for k in default)
+    while True:
+        answer = ask(f"\nWhich vendors should I export?\n{menu}\n"
+                     f"  Type numbers or names separated by commas (like 1,3), or all.\n"
+                     f"  Press Enter for: {default_names}\n  > ")
+        try:
+            picked = parse_vendor_choice(answer, default)
+        except ValueError as e:
+            say(f"  {e}")
+            continue
+        if picked:
+            say(f"  Exporting: {', '.join(RETAILERS[k] for k in picked)}")
+            return picked
+        say("  Pick at least one vendor.")
+
+
 def scrape(cfg, retailers: list[str], since: date, until: date, args) -> list[Order]:
     try:
         from playwright.sync_api import sync_playwright
     except ImportError:
         raise SystemExit("Playwright is not installed. Run setup.bat (or: pip install -r requirements.txt)")
-    from exporter.scraper import Scraper, launch_browser
+    from exporter.scraper import Scraper, launch_browser, login_all
 
     sites = load_sites(cfg.sites_file)
     all_orders: list[Order] = []
@@ -98,21 +143,26 @@ def scrape(cfg, retailers: list[str], since: date, until: date, args) -> list[Or
         browser, context = launch_browser(pw, cfg.browser_channel, headless=args.headless,
                                           executable_path=args.browser_path)
         try:
-            for key in retailers:
-                site = sites[key]
-                print(f"\n=== {site['name']} ({since} to {until}) ===")
-                s = Scraper(context, site, since, until, delay=cfg.delay_seconds,
-                            max_orders=cfg.max_orders_per_retailer, max_pages=cfg.max_list_pages,
-                            debug_dir=cfg.debug_dir, save_all_debug=args.debug)
+            # One tab per vendor, all opened together, so you log in to everything in one sitting.
+            scrapers = [Scraper(context, sites[key], since, until, delay=cfg.delay_seconds,
+                                max_orders=cfg.max_orders_per_retailer, max_pages=cfg.max_list_pages,
+                                debug_dir=cfg.debug_dir, save_all_debug=args.debug) for key in retailers]
+            try:
+                login_all(scrapers)
+            except KeyboardInterrupt:
+                print("\n  stopped by you before the export started")
+                return all_orders
+            for s in scrapers:
+                print(f"\n=== {s.site['name']} ({since} to {until}) ===")
                 try:
-                    s.wait_for_login()
                     s.run()
                 except KeyboardInterrupt:
-                    print(f"\n  stopped by you; keeping the {len(s.orders)} {site['name']} order(s) read so far")
+                    print(f"\n  stopped by you; keeping the {len(s.orders)} {s.site['name']} order(s) read so far")
                     all_orders += s.orders
                     break
-                print(f"  {site['name']}: {len(s.orders)} order(s) in range")
+                print(f"  {s.site['name']}: {len(s.orders)} order(s) in range")
                 all_orders += s.orders
+                s.close()
         finally:
             context.close()  # the session (cookies included) is discarded here
             browser.close()
@@ -130,8 +180,11 @@ def main(argv=None) -> int:
     if args.retailers:
         retailers = [canonical_retailer(r) for r in args.retailers.split(",") if r.strip()]
         retailers = [k for k, v in RETAILERS.items() if v in retailers]
-    names = {RETAILERS[k] for k in retailers}
     rules = load_rules(cfg.rules_file)  # fail early on a broken rules file, before any login
+    live = not args.dry_run and not args.from_json
+    if live and not args.retailers and cfg.ask_for_vendors and sys.stdin.isatty():
+        retailers = choose_vendors(retailers)
+    names = {RETAILERS[k] for k in retailers}
 
     source_orders = None
     if args.dry_run:

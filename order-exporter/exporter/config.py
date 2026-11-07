@@ -17,6 +17,7 @@ WEEKDAYS = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", 
 @dataclass
 class Config:
     retailers: list[str]
+    ask_for_vendors: bool
     lookback_days: int
     week_starts_on: int  # 0 = Monday ... 6 = Sunday
     output_dir: Path
@@ -73,13 +74,14 @@ def load_config(path: Path | None = None) -> Config:
 
     return Config(
         retailers=retailers,
+        ask_for_vendors=bool(g.get("ask_for_vendors", True)),
         lookback_days=int(g.get("lookback_days", 30)),
         week_starts_on=WEEKDAYS.index(week_day),
         output_dir=_resolve(g.get("output_dir", "output")),
         order_adjustments=mode,
         max_adjustment_percent=Decimal(str(g.get("max_adjustment_percent", 25))),
         weekly_grocery_budget=Decimal(str(b.get("weekly_grocery", 0))).quantize(Decimal("0.01")),
-        browser_channel=str(br.get("channel", "msedge")).lower(),
+        browser_channel=str(br.get("channel", "chrome")).lower(),
         delay_seconds=float(br.get("delay_seconds", 2.0)),
         max_orders_per_retailer=int(br.get("max_orders_per_retailer", 300)),
         max_list_pages=int(br.get("max_list_pages", 30)),

@@ -23,7 +23,7 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
 from exporter.config import load_sites  # noqa: E402
-from exporter.scraper import Scraper, launch_browser, parse_item  # noqa: E402
+from exporter.scraper import Scraper, launch_browser, login_all, parse_item  # noqa: E402
 
 FIX = Path(__file__).resolve().parent / "fixtures"
 D = Decimal
@@ -119,10 +119,47 @@ class ScraperTests(unittest.TestCase):
                     ask=lambda msg: prompts.append(msg) or "", log=lambda m: None)
         s.wait_for_login()
         orders = s.run()
-        s.list_page.close()
-        s.detail_page.close()
+        s.close()
         self.assertEqual(len(prompts), 1, "only the login prompt should be shown")
         return {o.order_number: o for o in orders}
+
+    def test_login_all_opens_one_tab_per_vendor_and_asks_once(self):
+        before = len(self.context.pages)
+        urls = {"amazon": "/amazon/list", "walmart": "/walmart/orders", "samsclub": "/sams/orders"}
+        scrapers = []
+        for key, path in urls.items():
+            site = dict(self.sites[key], login_url=self.base + path)
+            scrapers.append(Scraper(self.context, site, date(2026, 10, 15), date(2026, 11, 7), delay=0,
+                                    log=lambda m: None))
+        prompts = []
+        try:
+            left = login_all(scrapers, ask=lambda m: prompts.append(m) or "", log=lambda m: None)
+            self.assertEqual(left, [])
+            self.assertEqual(len(prompts), 1)
+            self.assertIn("Amazon, Walmart, Sam's Club", prompts[0])
+            self.assertEqual(len(self.context.pages), before + 3, "exactly one tab per vendor, no detail tabs yet")
+            self.assertEqual([s.list_page.url for s in scrapers], [self.base + p for p in urls.values()])
+        finally:
+            for s in scrapers:
+                s.close()
+
+    def test_login_all_names_tabs_still_signed_out(self):
+        # Pretend Walmart's page is a sign-in page: it should be named, re-asked, then reported as left over.
+        ok = Scraper(self.context, dict(self.sites["amazon"], login_url=self.base + "/amazon/list"),
+                     date(2026, 10, 15), date(2026, 11, 7), delay=0, log=lambda m: None)
+        out = Scraper(self.context, dict(self.sites["walmart"], login_url=self.base + "/walmart/orders",
+                                         login_url_markers=["/walmart/"]),
+                      date(2026, 10, 15), date(2026, 11, 7), delay=0, log=lambda m: None)
+        prompts = []
+        try:
+            left = login_all([ok, out], ask=lambda m: prompts.append(m) or "", log=lambda m: None, rechecks=2)
+            self.assertEqual(left, ["Walmart"])
+            self.assertEqual(len(prompts), 3)  # the one login prompt, then two "still waiting" reminders
+            self.assertIn("Walmart (sign in)", prompts[1])
+            self.assertNotIn("Amazon", prompts[1])
+        finally:
+            ok.close()
+            out.close()
 
     def items(self, order):
         return {i.name: (i.qty, i.unit_price, i.line_total) for i in order.items}

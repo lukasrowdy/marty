@@ -225,6 +225,38 @@ class DryRunTests(unittest.TestCase):
         self.assertLess(until, date.today())
 
 
+class VendorChoiceTests(unittest.TestCase):
+    def test_choices(self):
+        pick = export_orders.parse_vendor_choice
+        default = ["amazon", "walmart"]
+        self.assertEqual(pick("", default), default)
+        self.assertEqual(pick("all", default), ["amazon", "walmart", "samsclub"])
+        self.assertEqual(pick("3,1", default), ["amazon", "samsclub"])  # always in menu order
+        self.assertEqual(pick("1 3", default), ["amazon", "samsclub"])
+        self.assertEqual(pick("Sam's Club, walmart", default), ["walmart", "samsclub"])
+        self.assertEqual(pick("sams", default), ["samsclub"])
+        self.assertEqual(pick("wal; 1", default), ["amazon", "walmart"])
+        self.assertEqual(pick("a", default), ["amazon"])  # a unique start of a name is enough
+        for bad in ("4", "target", "x", "0"):
+            with self.assertRaises(ValueError, msg=bad):
+                pick(bad, default)
+
+    def test_prompt_asks_again_after_a_bad_answer(self):
+        answers = iter(["target", "2"])
+        said = []
+        got = export_orders.choose_vendors(["amazon"], ask=lambda m: next(answers), say=said.append)
+        self.assertEqual(got, ["walmart"])
+        self.assertTrue(any("target" in s for s in said))
+
+    def test_no_prompt_when_not_interactive(self):
+        # The test runner's stdin is not a console, so a dry run must never block on the vendor question.
+        with tempfile.TemporaryDirectory() as tmp:
+            buf = io.StringIO()
+            with redirect_stdout(buf):
+                self.assertEqual(export_orders.main(["--dry-run", "--out", tmp]), 0)
+            self.assertNotIn("Which vendors", buf.getvalue())
+
+
 class SitesFileTests(unittest.TestCase):
     """The shipped sites.toml patterns against URL and text shapes the retailers use."""
 

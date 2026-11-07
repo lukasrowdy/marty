@@ -3,7 +3,9 @@
 
 [general]
 # Which retailers to read. Any of: "amazon", "walmart", "samsclub"
+# When ask_for_vendors is true, each run asks which vendors to export and these are the default answer.
 retailers = ["amazon", "walmart", "samsclub"]
+ask_for_vendors = true
 
 # With no --since / --last-week, read this many days back from today.
 lookback_days = 30
@@ -31,9 +33,9 @@ sites_file = "sites.toml"
 weekly_grocery = 250.00
 
 [browser]
-# "msedge" (built into Windows 11, nothing extra to install), "chrome" (if installed), or
-# "chromium" (Playwright's own; needs: python -m playwright install chromium).
-channel = "msedge"
+# "chrome" (Google Chrome), "msedge" (built into Windows 11), or "chromium" (Playwright's own; needs:
+# python -m playwright install chromium). If the one named here won't start, the others are tried in turn.
+channel = "chrome"
 # Pause between order pages, in seconds. Slower is gentler on the sites and less likely to trigger checks.
 delay_seconds = 2.0
 # Safety limits per run.
