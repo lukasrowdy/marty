@@ -1,0 +1,65 @@
+# Order exporter settings. Edit with Notepad. Lines starting with # are comments.
+# No passwords or account details go in this file: you log in yourself in the browser window.
+
+[general]
+# Which retailers to read. Any of: "amazon", "walmart", "samsclub"
+retailers = ["amazon", "walmart", "samsclub"]
+
+# With no --since / --last-week, read this many days back from today.
+lookback_days = 30
+
+# First day of the week for the weekly summary: "monday" or "sunday" (any weekday works).
+week_starts_on = "monday"
+
+# Where the CSV / Excel files go (relative to this folder, or a full path like 'C:\Users\you\Documents\Orders').
+output_dir = "output"
+
+# "allocate": spread each order's tax, shipping, fees and discounts across its items, so items add up to
+#             the order total (what hit your card). Used for the Ledger file and the weekly summary.
+# "ignore":   use item prices only.
+order_adjustments = "allocate"
+
+# If items and order total differ by more than this percent (usually a missed item), the difference is
+# NOT spread across items; it goes on its own "Order adjustment" line tagged Other.
+max_adjustment_percent = 25
+
+rules_file = "category_rules.csv"
+sites_file = "sites.toml"
+
+[budget]
+# Weekly grocery budget in dollars, compared against Grocery spend in the weekly summary.
+weekly_grocery = 250.00
+
+[browser]
+# "msedge" (built into Windows 11, nothing extra to install), "chrome" (if installed), or
+# "chromium" (Playwright's own; needs: python -m playwright install chromium).
+channel = "msedge"
+# Pause between order pages, in seconds. Slower is gentler on the sites and less likely to trigger checks.
+delay_seconds = 2.0
+# Safety limits per run.
+max_orders_per_retailer = 300
+max_list_pages = 30
+
+[ledger]
+# Format of the date column. "%Y-%m-%d" = 2026-11-03, "%m/%d/%Y" = 11/03/2026.
+date_format = "%Y-%m-%d"
+# Description column. Placeholders: {retailer} {item} {order} {qty} {category}
+description = "{retailer}: {item}"
+# Remember which lines were already written to a Ledger file and leave them out next time, so
+# overlapping runs never double-import. Use --ledger-all for one run to include everything.
+skip_already_exported = true
+# Add a byte-order mark to the Ledger CSV. Leave false unless your Ledger app shows a stray "ï»¿" on "date".
+utf8_bom = false
+
+# The account column, per retailer: the card or account each retailer is paid from.
+[ledger.accounts]
+"Amazon" = "Credit Card"
+"Walmart" = "Credit Card"
+"Sam's Club" = "Credit Card"
+
+# The category column. Left side is the tag this tool uses; right side is the name your Ledger app uses.
+[ledger.category_names]
+"Grocery" = "Grocery"
+"Household" = "Household"
+"Business/Materials" = "Business/Materials"
+"Other" = "Other"

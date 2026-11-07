@@ -1,0 +1,437 @@
+{
+  "_note": "Made-up sample orders for --dry-run. Not real purchases. Same shape as the raw_orders_*.json a live run saves.",
+  "orders": [
+    {
+      "retailer": "Amazon",
+      "order_number": "113-4829173-5530218",
+      "date": "2026-10-19",
+      "order_total": "72.80",
+      "items": [
+        {
+          "name": "HP 67XL Black High-yield Ink Cartridge",
+          "qty": "1",
+          "unit_price": "34.89",
+          "line_total": "34.89"
+        },
+        {
+          "name": "AmazonBasics Multipurpose Copy Paper, 8.5 x 11, 500 Sheets, 5 Reams",
+          "qty": "1",
+          "unit_price": "32.99",
+          "line_total": "32.99"
+        }
+      ],
+      "url": ""
+    },
+    {
+      "retailer": "Walmart",
+      "order_number": "2000134-58821177",
+      "date": "2026-10-20",
+      "order_total": "65.28",
+      "items": [
+        {
+          "name": "Great Value Whole Vitamin D Milk, 1 Gallon",
+          "qty": "2",
+          "unit_price": "3.48",
+          "line_total": "6.96"
+        },
+        {
+          "name": "Great Value Large White Eggs, 18 Count",
+          "qty": "1",
+          "unit_price": "4.12",
+          "line_total": "4.12"
+        },
+        {
+          "name": "Bananas, each",
+          "qty": "6",
+          "unit_price": "0.27",
+          "line_total": "1.62"
+        },
+        {
+          "name": "Nature's Own Honey Wheat Bread, 20 oz",
+          "qty": "1",
+          "unit_price": "3.48",
+          "line_total": "3.48"
+        },
+        {
+          "name": "Tyson Boneless Skinless Chicken Breasts, 3 lb",
+          "qty": "1",
+          "unit_price": "11.97",
+          "line_total": "11.97"
+        },
+        {
+          "name": "Fresh Strawberries, 1 lb",
+          "qty": "2",
+          "unit_price": "2.97",
+          "line_total": "5.94"
+        },
+        {
+          "name": "Bounty Select-A-Size Paper Towels, 6 Double Rolls",
+          "qty": "1",
+          "unit_price": "15.94",
+          "line_total": "15.94"
+        },
+        {
+          "name": "Tide PODS Laundry Detergent, 42 Count",
+          "qty": "1",
+          "unit_price": "13.97",
+          "line_total": "13.97"
+        }
+      ],
+      "url": ""
+    },
+    {
+      "retailer": "Sam's Club",
+      "order_number": "8004417733",
+      "date": "2026-10-23",
+      "order_total": "99.16",
+      "items": [
+        {
+          "name": "Member's Mark Rotisserie Chicken",
+          "qty": "1",
+          "unit_price": "4.98",
+          "line_total": "4.98"
+        },
+        {
+          "name": "Member's Mark Ultra Premium Bath Tissue, 45 Rolls",
+          "qty": "1",
+          "unit_price": "24.98",
+          "line_total": "24.98"
+        },
+        {
+          "name": "Kirkland-style Ground Coffee, 3 lb",
+          "qty": "1",
+          "unit_price": "16.48",
+          "line_total": "16.48"
+        },
+        {
+          "name": "Member's Mark Large Eggs, 5 dozen",
+          "qty": "1",
+          "unit_price": "11.27",
+          "line_total": "11.27"
+        },
+        {
+          "name": "Grade A Ground Beef 80/20, 5 lb",
+          "qty": "1",
+          "unit_price": "24.62",
+          "line_total": "24.62"
+        },
+        {
+          "name": "Organic Baby Spinach, 1 lb",
+          "qty": "1",
+          "unit_price": "4.98",
+          "line_total": "4.98"
+        },
+        {
+          "name": "Member's Mark Bottled Water, 40 pk",
+          "qty": "2",
+          "unit_price": "4.48",
+          "line_total": "8.96"
+        }
+      ],
+      "url": ""
+    },
+    {
+      "retailer": "Amazon",
+      "order_number": "113-9917320-1184456",
+      "date": "2026-10-26",
+      "order_total": "56.27",
+      "items": [
+        {
+          "name": "Scotch Heavy Duty Shipping Packaging Tape, 6 Rolls",
+          "qty": "1",
+          "unit_price": "21.49",
+          "line_total": "21.49"
+        },
+        {
+          "name": "Bubble Mailers 6x10 inch, 50 Pack",
+          "qty": "1",
+          "unit_price": "16.99",
+          "line_total": "16.99"
+        },
+        {
+          "name": "Anker USB-C to USB-C Cable, 6 ft, 2 Pack",
+          "qty": "1",
+          "unit_price": "13.99",
+          "line_total": "13.99"
+        }
+      ],
+      "url": ""
+    },
+    {
+      "retailer": "Walmart",
+      "order_number": "2000136-11290463",
+      "date": "2026-10-28",
+      "order_total": "65.94",
+      "items": [
+        {
+          "name": "Great Value Whole Vitamin D Milk, 1 Gallon",
+          "qty": "2",
+          "unit_price": "3.48",
+          "line_total": "6.96"
+        },
+        {
+          "name": "Great Value Shredded Cheddar Cheese, 32 oz",
+          "qty": "1",
+          "unit_price": "8.47",
+          "line_total": "8.47"
+        },
+        {
+          "name": "Barilla Spaghetti Pasta, 16 oz",
+          "qty": "3",
+          "unit_price": "1.62",
+          "line_total": "4.86"
+        },
+        {
+          "name": "Prego Traditional Pasta Sauce, 24 oz",
+          "qty": "2",
+          "unit_price": "2.78",
+          "line_total": "5.56"
+        },
+        {
+          "name": "Fresh Gala Apples, 3 lb Bag",
+          "qty": "1",
+          "unit_price": "4.47",
+          "line_total": "4.47"
+        },
+        {
+          "name": "Hass Avocados, each",
+          "qty": "4",
+          "unit_price": "0.78",
+          "line_total": "3.12"
+        },
+        {
+          "name": "Great Value Frozen Broccoli Florets, 32 oz",
+          "qty": "1",
+          "unit_price": "3.97",
+          "line_total": "3.97"
+        },
+        {
+          "name": "Dawn Platinum Dish Soap, 24 oz",
+          "qty": "1",
+          "unit_price": "4.47",
+          "line_total": "4.47"
+        },
+        {
+          "name": "Hefty Strong Trash Bags, 13 Gallon, 80 Count",
+          "qty": "1",
+          "unit_price": "14.97",
+          "line_total": "14.97"
+        }
+      ],
+      "url": ""
+    },
+    {
+      "retailer": "Sam's Club",
+      "order_number": "8004502219",
+      "date": "2026-10-31",
+      "order_total": "88.97",
+      "items": [
+        {
+          "name": "Member's Mark Atlantic Salmon Fillets, 3 lb",
+          "qty": "1",
+          "unit_price": "26.98",
+          "line_total": "26.98"
+        },
+        {
+          "name": "Member's Mark Organic Bananas, 3 lb",
+          "qty": "1",
+          "unit_price": "2.48",
+          "line_total": "2.48"
+        },
+        {
+          "name": "Member's Mark Variety Snack Chips, 50 ct",
+          "qty": "1",
+          "unit_price": "17.98",
+          "line_total": "17.98"
+        },
+        {
+          "name": "Member's Mark Paper Plates, 300 ct",
+          "qty": "1",
+          "unit_price": "14.48",
+          "line_total": "14.48"
+        },
+        {
+          "name": "Simply Orange Juice, 2 pk 89 oz",
+          "qty": "1",
+          "unit_price": "10.98",
+          "line_total": "10.98"
+        },
+        {
+          "name": "Member's Mark Butter, 4 lb",
+          "qty": "1",
+          "unit_price": "13.48",
+          "line_total": "13.48"
+        }
+      ],
+      "url": ""
+    },
+    {
+      "retailer": "Amazon",
+      "order_number": "114-2203384-7720915",
+      "date": "2026-11-01",
+      "order_total": "98.57",
+      "items": [
+        {
+          "name": "DEWALT Drill Bit Set, 21 Piece",
+          "qty": "1",
+          "unit_price": "24.98",
+          "line_total": "24.98"
+        },
+        {
+          "name": "GRK Fasteners 2x4 Framing Screws, 100 ct",
+          "qty": "2",
+          "unit_price": "18.47",
+          "line_total": "36.94"
+        }
+      ],
+      "url": ""
+    },
+    {
+      "retailer": "Walmart",
+      "order_number": "2000138-77016652",
+      "date": "2026-11-03",
+      "order_total": "91.12",
+      "items": [
+        {
+          "name": "Great Value Large White Eggs, 18 Count",
+          "qty": "1",
+          "unit_price": "4.12",
+          "line_total": "4.12"
+        },
+        {
+          "name": "Great Value 2% Reduced Fat Milk, 1 Gallon",
+          "qty": "1",
+          "unit_price": "3.38",
+          "line_total": "3.38"
+        },
+        {
+          "name": "Fresh Russet Potatoes, 5 lb Bag",
+          "qty": "1",
+          "unit_price": "3.97",
+          "line_total": "3.97"
+        },
+        {
+          "name": "Yellow Onions, 3 lb Bag",
+          "qty": "1",
+          "unit_price": "2.97",
+          "line_total": "2.97"
+        },
+        {
+          "name": "Oscar Mayer Thick Cut Bacon, 16 oz",
+          "qty": "2",
+          "unit_price": "6.98",
+          "line_total": "13.96"
+        },
+        {
+          "name": "Folgers Classic Roast Ground Coffee, 30.5 oz",
+          "qty": "1",
+          "unit_price": "12.98",
+          "line_total": "12.98"
+        },
+        {
+          "name": "Purina ONE Dry Dog Food, 16.5 lb",
+          "qty": "1",
+          "unit_price": "29.98",
+          "line_total": "29.98"
+        },
+        {
+          "name": "Energizer AA Batteries, 24 Pack",
+          "qty": "1",
+          "unit_price": "17.97",
+          "line_total": "17.97"
+        }
+      ],
+      "url": ""
+    },
+    {
+      "retailer": "Amazon",
+      "order_number": "113-5550192-3388104",
+      "date": "2026-11-04",
+      "order_total": "56.48",
+      "items": [
+        {
+          "name": "Nature Valley Crunchy Granola Bars, 49 Count",
+          "qty": "1",
+          "unit_price": "14.68",
+          "line_total": "14.68"
+        },
+        {
+          "name": "Brita Standard Water Filter Replacements, 6 Count",
+          "qty": "1",
+          "unit_price": "27.99",
+          "line_total": "27.99"
+        },
+        {
+          "name": "Rollerball Gel Pens, 12 Pack",
+          "qty": "1",
+          "unit_price": "9.99",
+          "line_total": "9.99"
+        }
+      ],
+      "url": ""
+    },
+    {
+      "retailer": "Sam's Club",
+      "order_number": "8004588120",
+      "date": "2026-11-06",
+      "order_total": "139.42",
+      "items": [
+        {
+          "name": "Member's Mark Boneless Skinless Chicken Breasts, 6 lb",
+          "qty": "1",
+          "unit_price": "19.88",
+          "line_total": "19.88"
+        },
+        {
+          "name": "Member's Mark Shredded Mozzarella Cheese, 5 lb",
+          "qty": "1",
+          "unit_price": "17.48",
+          "line_total": "17.48"
+        },
+        {
+          "name": "Fresh Strawberries, 4 lb",
+          "qty": "1",
+          "unit_price": "8.98",
+          "line_total": "8.98"
+        },
+        {
+          "name": "Member's Mark Frozen Pizza, 4 pk",
+          "qty": "1",
+          "unit_price": "16.98",
+          "line_total": "16.98"
+        },
+        {
+          "name": "Member's Mark Ice Cream, 1 gal",
+          "qty": "1",
+          "unit_price": "7.98",
+          "line_total": "7.98"
+        },
+        {
+          "name": "Member's Mark Commercial Laundry Detergent, 300 loads",
+          "qty": "1",
+          "unit_price": "23.98",
+          "line_total": "23.98"
+        },
+        {
+          "name": "Member's Mark Sparkling Water, 24 pk",
+          "qty": "1",
+          "unit_price": "9.98",
+          "line_total": "9.98"
+        },
+        {
+          "name": "Member's Mark Tortilla Chips, 40 oz",
+          "qty": "1",
+          "unit_price": "5.48",
+          "line_total": "5.48"
+        },
+        {
+          "name": "Grade A Ground Beef 80/20, 5 lb",
+          "qty": "1",
+          "unit_price": "24.62",
+          "line_total": "24.62"
+        }
+      ],
+      "url": ""
+    }
+  ]
+}

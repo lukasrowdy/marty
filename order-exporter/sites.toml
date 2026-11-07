@@ -1,0 +1,105 @@
+# How each retailer's order pages are read.
+#
+# Retailers redesign their pages without warning. When one stops exporting (no orders found, or orders
+# with no items), the fix is usually here, not in the code. See README section "When a site changes".
+#
+# Patterns are Python regular expressions written as TOML literal strings ('...', no escaping needed).
+# {date} inside date_patterns is replaced with a regex that matches "Nov 3, 2026", "November 3, 2026",
+# "11/03/2026" and "2026-11-03". The text in parentheses ( ) is what gets read.
+#
+# A retailer section replaces a [defaults] list of the same name; a key ending in _extra adds to it instead.
+
+[defaults]
+# Where the order date is printed on an order-detail page. First pattern that matches wins.
+date_patterns = [
+  '(?:order placed|ordered on|order date|placed on|purchased on|purchase date|date of purchase)\s*:?\s*({date})',
+  '({date})\s+(?:order|purchase|in-club purchase|store purchase)\b',
+  '({date})',
+]
+# Where the order total is printed. "Total" must be followed by an amount, so "Total savings" is not read.
+total_patterns = [
+  'grand total\s*:?\s*\$\s?([\d,]+\.\d{2})',
+  'order total\s*:?\s*\$\s?([\d,]+\.\d{2})',
+  '\btotal\s*:?\s*\$\s?([\d,]+\.\d{2})',
+]
+# A detail page matching one of these is skipped.
+skip_order_patterns = [
+  'this order (?:has been|was) cancell?ed',
+  'order cancell?ed',
+]
+# Text that means the site wants a human: the script pauses and asks you to deal with it.
+blocked_patterns = [
+  'robot or human',
+  'press\s*&\s*hold',
+  'enter the characters you see',
+  'verify (?:that )?you are (?:a )?human',
+  'captcha',
+]
+# URL fragments that mean you were sent to a sign-in page.
+login_url_markers = ["/ap/signin", "/account/login", "/login?", "/signin"]
+# Product links inside these are recommendations, not things you bought.
+exclude_selectors = [
+  '[class*="carousel" i]',
+  '[data-testid*="carousel" i]',
+  '[aria-roledescription="carousel"]',
+  '[class*="recommend" i]',
+  '[id*="recommend" i]',
+  '[class*="sponsored" i]',
+  'header', 'footer', 'nav',
+]
+# When climbing from a product link to its block, stop before a block containing any of these words.
+block_stop_regex = 'order summary|grand total|order total|subtotal|payment method|shipping address|ship to'
+# Tried in order to reach the next page of the order list.
+next_selectors = [
+  'a:has-text("Next")',
+  'button:has-text("Next")',
+  'button:has-text("Load more")',
+  'button:has-text("Show more")',
+  'button:has-text("View more")',
+]
+
+[amazon]
+name = "Amazon"
+login_url = "https://www.amazon.com/gp/css/order-history"
+list_urls = ["https://www.amazon.com/gp/css/order-history?orderFilter=year-{year}"]
+# Links from the list to each order's detail page, and the order number inside them.
+order_link_regex = 'order-details\?(?:[^#]*?&)?orderI[Dd]=([A-Z0-9][A-Z0-9-]{9,})'
+# Fallback when the list shows order numbers but no detail links.
+order_url_template = "https://www.amazon.com/gp/your-account/order-details?orderID={id}"
+order_id_text_regex = '\b(\d{3}-\d{7}-\d{7})\b'
+# Product links on the detail page; the group is the product id (ASIN).
+product_link_regex = '/(?:dp|gp/product)/([A-Z0-9]{10})'
+items_root_selectors = ["#orderDetails", '[data-component="orderDetails"]', "#od-shipments"]
+# Amazon prints quantity as a small number on the product image.
+qty_selector = '.od-item-view-qty, .product-image__qty, .item-view-qty'
+# Amazon shows the price of one unit next to each item.
+price_is_line_total = false
+next_selectors_extra = ['ul.a-pagination li.a-last a']
+
+[walmart]
+name = "Walmart"
+login_url = "https://www.walmart.com/orders"
+list_urls = ["https://www.walmart.com/orders"]
+order_link_regex = 'walmart\.com/orders/(\d[\d-]{7,})'
+order_url_template = "https://www.walmart.com/orders/{id}"
+order_id_text_regex = 'Order\s*#\s*:?\s*(\d[\d-]{9,})'
+product_link_regex = '/ip/(?:[^/?#]+/)?(\d{5,})'
+items_root_selectors = []
+qty_selector = ""
+# Walmart prints the price for the whole line (all units); a "$x.xx/ea" price is used as unit price when shown.
+price_is_line_total = true
+next_selectors_extra = ['button[aria-label="Next Page"]', 'a[aria-label="Next Page"]', 'button[data-automation-id="next-pages-button"]']
+
+[samsclub]
+name = "Sam's Club"
+login_url = "https://www.samsclub.com/orders"
+list_urls = ["https://www.samsclub.com/orders"]
+order_link_regex = 'samsclub\.com/orders?/(?:details/)?([0-9][0-9-]{5,})'
+order_url_template = "https://www.samsclub.com/orders/{id}"
+order_id_text_regex = 'Order\s*#\s*:?\s*([0-9][0-9-]{7,})'
+product_link_regex = '/p/(?:[^/?#]+/)?([A-Za-z]*\d{4,})'
+items_root_selectors = []
+qty_selector = ""
+# Sam's Club prints the price for the whole line; "$x.xx/ea" is used as unit price when shown.
+price_is_line_total = true
+next_selectors_extra = ['button[aria-label="Next Page"]', 'a[aria-label="Next page"]']

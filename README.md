@@ -141,6 +141,7 @@ git-tools/
   test_secret_scan.py        28 tests: every rule both ways, ignore file, config, end to end
   test_install_hooks.py      6 tests: install, idempotence, and real commits through the hooks
 .claude/agents/              the seven subagent definitions
+order-exporter/              Amazon, Walmart and Sam's Club order history to CSV, Excel, a Ledger import and a weekly summary
 ```
 
 Try it (Windows, Python 3.12):

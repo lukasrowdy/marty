@@ -1,0 +1,5 @@
+# Your order data and run state stay on your PC, never in git.
+output/
+state/
+debug/
+.venv/

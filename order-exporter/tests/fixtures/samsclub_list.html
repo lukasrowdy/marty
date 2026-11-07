@@ -1,0 +1,12 @@
+<!doctype html><html><head><meta charset="utf-8"><title>Orders</title></head><body>
+<div class="order"><a href="/sams/orders/8004588120">Order details</a><div>Nov 6, 2026 In-club purchase</div></div>
+<button>Load more</button>
+<script>
+document.querySelector('button').addEventListener('click', () => {
+  const d = document.createElement('div');
+  d.innerHTML = '<a href="/sams/orders/8004000001">Order details</a><div>Aug 1, 2026</div>';
+  document.body.insertBefore(d, document.querySelector('button'));
+  document.querySelector('button').remove();
+});
+</script>
+</body></html>
