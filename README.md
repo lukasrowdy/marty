@@ -116,6 +116,12 @@ The full list, with the reasoning, is in [docs/roadmap.md](docs/roadmap.md).
 
 ---
 
+## Teaching it: the Claude Duet onboarding class
+
+[onboarding/](onboarding/) packages what Marty taught into a one-week class for small-business owners: a 4-hour Launch Day, then 30 minutes a day, one task a day, for 7 days. An intake sheet feeds a kit builder that writes each client's Claude Code workspace (business profile, voice, a slash command per time sink, deny rules, a credit plan sized to one week), and a local sanitization check screens every folder before Claude reads it. Details: [onboarding/README.md](onboarding/README.md).
+
+---
+
 ## What's in this repo
 
 This is a showcase, not the working system. The published code is excerpted from a private working repo and scrubbed: machine paths are environment variables or placeholders, credential-store target names are generic, and anything personal is gone. The logic is unchanged.
@@ -141,6 +147,8 @@ git-tools/
   test_secret_scan.py        28 tests: every rule both ways, ignore file, config, end to end
   test_install_hooks.py      6 tests: install, idempotence, and real commits through the hooks
 .claude/agents/              the seven subagent definitions
+onboarding/                  the Claude Duet onboarding class: intake, curriculum, script library,
+                             kit builder, local sanitization check, and their tests
 ```
 
 Try it (Windows, Python 3.12):

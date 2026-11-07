@@ -1,0 +1,51 @@
+{
+  "business": {
+    "name": "Ridgeline Mobile Detailing",
+    "description": "We detail cars, trucks and boats at your home or office, so you never have to drop it off.",
+    "industry": "auto detailing (mobile service)",
+    "location": "Boise, Idaho",
+    "timezone": "America/Boise",
+    "hours": "Mon to Sat, 8am to 6pm",
+    "team_size": 3,
+    "website": "https://ridgeline-detailing.example.com"
+  },
+  "owner": {
+    "first_name": "Dana",
+    "role": "owner"
+  },
+  "customers": {
+    "who": "busy homeowners, small fleet owners (contractors, realtors), and boat owners in spring",
+    "common_requests": ["price for a full interior and exterior detail", "booking a time this week", "ceramic coating questions"],
+    "price_range": "$150 to $450 per vehicle, fleet deals by quote"
+  },
+  "voice": {
+    "adjectives": ["friendly", "straightforward", "local"],
+    "sign_off": "Thanks, Dana",
+    "never_say": ["valued customer", "per my last email", "emojis"],
+    "sample": "Hi there, thanks for reaching out! A full detail on a mid-size SUV runs $275 and takes about 3 hours. I have Thursday morning or Saturday afternoon open. Which works better? Thanks, Dana"
+  },
+  "tools": {
+    "email": "Gmail",
+    "calendar": "Google Calendar",
+    "files": "Google Drive (synced to the laptop)",
+    "accounting": "QuickBooks Online",
+    "crm": "a Google Sheet of customers",
+    "social": ["Facebook", "Instagram", "Google Business Profile"]
+  },
+  "time_sinks": ["email-replies", "quotes-proposals", "reviews", "invoice-followups", "social-posts"],
+  "dream_automation": "Every evening, look at tomorrow's bookings and draft a reminder text for each customer with the time window and what to have ready (keys, vehicle unlocked, water spigot).",
+  "data": {
+    "share_folders": ["Documents/Ridgeline/Quotes", "Documents/Ridgeline/Templates", "Documents/Ridgeline/Marketing"],
+    "private_folders": ["Documents/Personal", "Documents/Ridgeline/Payroll", "Documents/Ridgeline/Taxes"],
+    "never_share": ["employee pay", "customer card numbers", "the business bank account"],
+    "approval_required": ["sending any email or message", "paying or refunding anything", "deleting anything", "signing or accepting anything", "posting publicly"]
+  },
+  "setup": {
+    "os": "windows",
+    "plan": "pro",
+    "weekly_budget_usd": null,
+    "duet": "waitlist",
+    "day0": "Saturday 9am",
+    "daily_time": "7:30am before the first job"
+  }
+}

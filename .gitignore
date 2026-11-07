@@ -13,3 +13,6 @@ private/
 .secretscanignore
 Thumbs.db
 .DS_Store
+onboarding/kits/
+onboarding/intake/clients/
+sanitize-report.md
