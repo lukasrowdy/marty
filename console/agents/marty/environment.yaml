@@ -1,0 +1,9 @@
+# The cloud workspace every session of the band runs in.
+# Networking is unrestricted because skeptic, researcher and cyber-specialist
+# read vendor docs, release notes and standards from anywhere on the web.
+# Nothing private is mounted here: no vault, no keys, no PC files.
+name: marty-band
+config:
+  type: cloud
+  networking:
+    type: unrestricted
