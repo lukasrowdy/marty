@@ -128,11 +128,17 @@ docs/
   rules.md                   the rules that can't lapse, generalized, with the lesson behind each
   vault-structure.md         the folder skeleton and how indexes, Jobs and daily notes work
   roadmap.md                 what's being built next
+  handoff-board.md           the shared board of open loops (roadmap item 1, first version)
+  trial-customer-service.md  plan for the first scheduled customer-service trial
   how-marty-works.png/.html  the one-page diagram and its source
 tools/
   switchboard.py             one door to every model, with the private lane and the spend meter
   cred.py                    Windows Credential Manager store the switchboard reads keys from
   simple_docx.py             a .docx writer with no third-party packages
+  handoff.py                 the handoff board CLI: memory-store and folder backends
+  test_handoff.py            11 tests for the board
+console/
+  board-rules.md             the board rules block for Console-built agents' system prompts
 git-tools/
   secret_scan.py             the pre-commit secret scan
   install_hooks.py           points core.hooksPath at git-tools/hooks

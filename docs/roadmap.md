@@ -14,6 +14,8 @@ What's next, in build order, with the reason for each. Everything here follows t
 
 Every surface (chat, voice, phone) reads it before answering anything about state, and writes to it the moment it asks a question or makes a promise. Closing an item deletes it. The note stays small on purpose: it is read on every turn.
 
+**First version built:** [handoff-board.md](handoff-board.md). Because the agents are now built on Claude through the Console, the board lives in a Managed Agents memory store (one small file per open item) instead of a single vault note, with the vault keeping a read-only mirror.
+
 ## 2. End-to-end preflight health check
 
 **Why:** "it's up" has been wrong before, in both directions. A process can be running while the chain the user depends on is broken, and a service can be marked down while its log shows it live.
